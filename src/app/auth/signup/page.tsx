@@ -35,7 +35,12 @@ export default function SignUpPage() {
         toast.error(data.error || 'Registration failed')
         return
       }
-      await signIn('credentials', { email: form.email, password: form.password, redirect: false })
+      const signInRes = await signIn('credentials', { email: form.email, password: form.password, redirect: false })
+      if (signInRes?.error) {
+        toast.error('Account created but sign-in failed. Please sign in manually.')
+        router.push('/auth/signin')
+        return
+      }
       router.push('/onboarding')
     } catch {
       toast.error('Something went wrong')

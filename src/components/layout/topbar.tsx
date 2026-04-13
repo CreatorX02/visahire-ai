@@ -1,9 +1,8 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { Bell, Search, LogOut, User, Settings, ChevronDown } from 'lucide-react'
-import { useState } from 'react'
 
 export function TopBar() {
   const { data: session } = useSession()

@@ -17,10 +17,11 @@ export function ScoreRing({ score, size = 80, strokeWidth = 6, showLabel = true 
   const color = score >= 80 ? '#10B981' : score >= 60 ? '#F59E0B' : '#F43F5E'
 
   useEffect(() => {
+    let interval: ReturnType<typeof setInterval>
     const timer = setTimeout(() => {
       let current = 0
       const increment = score / 30
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         current += increment
         if (current >= score) {
           setDisplayScore(score)
@@ -29,9 +30,11 @@ export function ScoreRing({ score, size = 80, strokeWidth = 6, showLabel = true 
           setDisplayScore(Math.floor(current))
         }
       }, 20)
-      return () => clearInterval(interval)
     }, 100)
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      clearInterval(interval)
+    }
   }, [score])
 
   return (

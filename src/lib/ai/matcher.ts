@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { openai } from '@/lib/openai'
 
-const BATCH_SIZE = parseInt(process.env.MATCH_BATCH_SIZE || '20')
+const parsedBatchSize = parseInt(process.env.MATCH_BATCH_SIZE || '20', 10)
+const BATCH_SIZE = Number.isFinite(parsedBatchSize) && parsedBatchSize > 0 ? parsedBatchSize : 20
 
 export async function runJobMatching(userId: string) {
   const profile = await prisma.userProfile.findUnique({ where: { userId } })

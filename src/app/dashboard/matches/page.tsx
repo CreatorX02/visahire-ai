@@ -182,7 +182,7 @@ export default function MatchesPage() {
           <p className="text-[#94A3B8] text-lg mb-2">No matches found</p>
           <p className="text-[#94A3B8] text-sm mb-6">Click &quot;Find New Matches&quot; to run the AI matching engine</p>
           <Button onClick={runMatching} loading={running}>
-            <RefreshCw className="w-4 h-4" /> Find Matches Now
+            <RefreshCw className="w-4 h-4" /> Find New Matches
           </Button>
         </div>
       ) : (

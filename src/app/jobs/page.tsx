@@ -47,6 +47,18 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
 
   const totalPages = Math.ceil(total / limit)
 
+  const buildPageUrl = (p: number) => {
+    const qs = new URLSearchParams()
+    if (params.q) qs.set('q', params.q)
+    if (params.country) qs.set('country', params.country)
+    if (params.type) qs.set('type', params.type)
+    if (params.level) qs.set('level', params.level)
+    if (params.remote) qs.set('remote', params.remote)
+    if (params.sort) qs.set('sort', params.sort)
+    qs.set('page', String(p))
+    return `/jobs?${qs.toString()}`
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0F1117' }}>
       {/* Header */}
@@ -201,14 +213,14 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
         {totalPages > 1 && (
           <div className="flex justify-center gap-2">
             {page > 1 && (
-              <Link href={`/jobs?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>
+              <Link href={buildPageUrl(page - 1)}>
                 <button className="px-4 py-2 bg-[#1A1D27] border border-[#2A2D3A] rounded-lg text-sm text-[#94A3B8] hover:text-[#F1F5F9] hover:border-[#3A3D4A]">← Previous</button>
               </Link>
             )}
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               const p = Math.max(1, Math.min(totalPages - 4, page - 2)) + i
               return (
-                <Link key={p} href={`/jobs?${new URLSearchParams({ ...params, page: String(p) })}`}>
+                <Link key={p} href={buildPageUrl(p)}>
                   <button className={`px-4 py-2 rounded-lg text-sm border transition-colors ${p === page ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-[#1A1D27] border-[#2A2D3A] text-[#94A3B8] hover:border-[#3A3D4A]'}`}>
                     {p}
                   </button>
@@ -216,7 +228,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
               )
             })}
             {page < totalPages && (
-              <Link href={`/jobs?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>
+              <Link href={buildPageUrl(page + 1)}>
                 <button className="px-4 py-2 bg-[#1A1D27] border border-[#2A2D3A] rounded-lg text-sm text-[#94A3B8] hover:text-[#F1F5F9] hover:border-[#3A3D4A]">Next →</button>
               </Link>
             )}

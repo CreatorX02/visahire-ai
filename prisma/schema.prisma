@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String?
+  avatar        String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  profile       UserProfile?
+  cvs           CV[]
+  jobMatches    JobMatch[]
+  interviewPreps InterviewPrep[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model UserProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetRole         String?
+  targetCountry      String[]
+  yearsOfExperience  Int?
+  currentLocation    String?
+  skills             String[]
+  preferredSalaryMin Int?
+  preferredSalaryMax Int?
+  noticePeriod       String?
+  visaStatus         String?
+  industry           String?
+  onboardingComplete Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model CV {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  originalFileName   String
+  filePath           String
+  extractedText      String   @db.Text
+  standardizedVersion String? @db.Text
+  overallScore       Int?
+  improvements       String[]
+  missingSections    String[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Job {
+  id                      String   @id @default(cuid())
+  title                   String
+  company                 String
+  companyLogo             String?
+  location                String?
+  country                 String?
+  isRemote                Boolean  @default(false)
+  salaryMin               Int?
+  salaryMax               Int?
+  currency                String?
+  jobUrl                  String   @unique
+  description             String   @db.Text
+  requirements            String?  @db.Text
+  visaSponsorshipConfirmed Boolean @default(false)
+  source                  String
+  jobType                 String?
+  experienceLevel         String?
+  postedDate              DateTime?
+  scrapedAt               DateTime @default(now())
+  isExpired               Boolean  @default(false)
+  expiredAt               DateTime?
+  category                String?
+  tags                    String[]
+  jobMatches              JobMatch[]
+  interviewPreps          InterviewPrep[]
+}
+
+model JobMatch {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  matchScore  Int
+  matchReason String?  @db.Text
+  strengths   String[]
+  gaps        String[]
+  salaryMatch String?
+  locationMatch Boolean?
+  experienceMatch String?
+  status      String   @default("new")
+  createdAt   DateTime @default(now())
+  @@unique([userId, jobId])
+}
+
+model InterviewPrep {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId               String
+  job                 Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  questions           Json
+  companyResearchNotes String? @db.Text
+  visaSpecificTips    String[]
+  redFlags            String[]
+  createdAt           DateTime @default(now())
+  @@unique([userId, jobId])
+}
+
+model ScrapeLog {
+  id          String   @id @default(cuid())
+  source      String
+  status      String
+  jobsFound   Int      @default(0)
+  jobsAdded   Int      @default(0)
+  jobsUpdated Int      @default(0)
+  jobsExpired Int      @default(0)
+  errorLog    String?  @db.Text
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+}
+
+model AgentActivity {
+  id        String   @id @default(cuid())
+  agentType String
+  action    String
+  status    String
+  details   Json?
+  timestamp DateTime @default(now())
+}
